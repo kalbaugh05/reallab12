@@ -1,4 +1,5 @@
 """REST API server for anonymizer."""
+from presidio_anonymizer.operators.genz import GenZOperator
 
 import logging
 import os
@@ -111,6 +112,57 @@ class Server:
         def server_error(e):
             self.logger.error(f"A fatal error occurred during execution: {e}")
             return jsonify(error="Internal server error"), 500
+        
+
+
+
+
+
+        @self.app.route("/genz-preview", methods=["GET"])
+        def genz_preview() -> Response:
+            """Return an example of the Gen-Z anonymizer output."""
+            example_output = {
+                "example": "Call Emily at 577-988-1234",
+                "example output": "Call GOAT at vibe check",
+                "description": "Example output of the genz anonymizer."
+            }
+            return jsonify(example_output)
+
+        @self.app.route("/genz", methods=["POST"])
+        def genz() -> Response:
+            """Anonymizes the text using the Gen-Z operator for all entities."""
+            content = request.get_json()
+            if not content:
+                raise BadRequest("Invalid request json")
+
+            # 1. Convert analyzer results from the request body
+            analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
+                content.get("analyzer_results")
+            )
+
+            # 2. Define the operator configuration: force 'genz' for all entities.
+            # This ensures every entity in analyzer_results is handled by the genz operator.
+            genz_config = {"DEFAULT": {"operator_name": GenZOperator.NAME}}
+
+            # 3. Anonymize
+            anonymizer_result = self.anonymizer.anonymize(
+                text=content.get("text", ""),
+                analyzer_results=analyzer_results,
+                operators=genz_config,
+            )
+            return Response(anonymizer_result.to_json(), mimetype="application/json")
+         
+
+
+
+
+
+
+
+
+
+
+
 
 def create_app(): # noqa
     server = Server()
