@@ -401,3 +401,47 @@ def test_overlapping_keep_both():
 
     assert response_status == 200
     assert equal_json_strings(expected_response, response_content)
+
+
+
+
+
+
+def test_given_anonymize_called_with_genz_then_expected_valid_response_returned(client):
+    payload = {
+        "text": "Please contact Emily Carter at 734-555-9284 if you have questions about the workshop registration.",
+        "analyzer_results": [
+            {"start": 15, "end": 27, "score": 0.3, "entity_type": "PERSON"},
+            {"start": 31, "end": 43, "score": 0.95, "entity_type": "PHONE_NUMBER"}
+        ]
+    }
+    response = client.post("/genz", json=payload)
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert "text" in json_data
+    assert "items" in json_data
+
+
+def test_given_anonymize_called_with_genz_then_expected_valid_response_returned(client):
+    request_body = {
+        "text": "Please contact Emily Carter at 734-555-9284 if you have questions.",
+        "analyzer_results": [
+            {
+                "start": 15,
+                "end": 27,
+                "score": 0.3,
+                "entity_type": "PERSON"
+            },
+            {
+                "start": 31,
+                "end": 43,
+                "score": 0.95,
+                "entity_type": "PHONE_NUMBER"
+            }
+        ]
+    }
+
+    response = common.methods.genz(client, request_body)
+
+    # Because GenZ output is random, just assert status
+    assert response.status_code == 200

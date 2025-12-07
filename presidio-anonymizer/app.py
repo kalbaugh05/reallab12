@@ -118,40 +118,44 @@ class Server:
 
 
 
-        @self.app.route("/genz-preview", methods=["GET"])
-        def genz_preview() -> Response:
-            """Return an example of the Gen-Z anonymizer output."""
-            example_output = {
-                "example": "Call Emily at 577-988-1234",
-                "example output": "Call GOAT at vibe check",
-                "description": "Example output of the genz anonymizer."
-            }
-            return jsonify(example_output)
+        @app.route("/genz-preview", methods=["GET"])
+        def genz_preview():
+          example_input = "Call Emily at 577-988-1234"
+          example_output = "Call GOAT at vibe check"
+          return jsonify({
+            "example": example_input,
+            "example output": example_output,
+           "description": "Example output of the genz anonymizer."
+         }), 200
 
-        @self.app.route("/genz", methods=["POST"])
-        def genz() -> Response:
-            """Anonymizes the text using the Gen-Z operator for all entities."""
-            content = request.get_json()
-            if not content:
-                raise BadRequest("Invalid request json")
+@app.route("/genz", methods=["POST"])
+def genz():
+    try:
+        data = request.get_json()
 
-            # 1. Convert analyzer results from the request body
-            analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
-                content.get("analyzer_results")
-            )
+        text = data.get("text", "")
+        analyzer_results = data.get("analyzer_results", [])
 
-            # 2. Define the operator configuration: force 'genz' for all entities.
-            # This ensures every entity in analyzer_results is handled by the genz operator.
-            genz_config = {"DEFAULT": {"operator_name": GenZOperator.NAME}}
+        genz_config = {
+            "DEFAULT": {"operator_name": GenZOperator.NAME}
+        }
 
-            # 3. Anonymize
-            anonymizer_result = self.anonymizer.anonymize(
-                text=content.get("text", ""),
-                analyzer_results=analyzer_results,
-                operators=genz_config,
-            )
-            return Response(anonymizer_result.to_json(), mimetype="application/json")
-         
+        anonymizer_result = self.anonymizer_engine.anonymize(
+            text=text,
+            analyzer_results=analyzer_results,
+            operators=genz_config
+        )
+
+        return Response(
+            anonymizer_result.to_json(),
+            mimetype="application/json"
+        )
+
+    except Exception as e:
+        self.logger.error(f"Error in /genz endpoint: {e}")
+        return jsonify(error="Invalid request"), 400
+
+
 
 
 
