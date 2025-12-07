@@ -6,7 +6,7 @@ from typing import Dict, List
 from presidio_anonymizer.operators import Operator, OperatorType
 
 
-class GenZOperator(Operator):
+class GenZ(Operator):
     """Replaces the PII text entity with gen-z slang."""
 
     # Mapping from entity type → list of slang terms

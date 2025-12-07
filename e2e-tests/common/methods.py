@@ -48,13 +48,3 @@ def __get_multipart_form_data(file):
             "image": (file.name, file, "multipart/form-data"),
         }
     return multipart_form_data
-
-
-def genz(client, body):
-    return client.post(
-        "/genz",
-        json=body,
-        headers={"Content-Type": "application/json"}
-    )
-def genz(text: str):
-    return f"GENZ: {text}"

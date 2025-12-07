@@ -1,4 +1,5 @@
 """REST API server for anonymizer."""
+
 import logging
 import os
 from logging.config import fileConfig
@@ -7,7 +8,6 @@ from pathlib import Path
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
 from presidio_anonymizer.entities import InvalidParamError
-from presidio_anonymizer.operators.genz import GenZOperator
 from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
 
@@ -111,53 +111,6 @@ class Server:
         def server_error(e):
             self.logger.error(f"A fatal error occurred during execution: {e}")
             return jsonify(error="Internal server error"), 500
-
-
-
-
-
-
-        @self.app.route("/genz-preview", methods=["GET"])
-        def genz_preview():
-            """Return an example GenZ transformation."""
-            example_input = "Call Emily at 577-988-1234"
-            example_output = "Call GOAT at vibe check"
-            return jsonify(
-                {
-                    "example": example_input,
-                    "example_output": example_output,
-                    "description": "Example output of the GenZ anonymizer."
-                }
-            ), 200
-
-        @self.app.route("/genz", methods=["POST"])
-        def genz():
-            """Apply the GenZOperator anonymizer."""
-            data = request.get_json()
-            if not data or "text" not in data:
-                return jsonify({"error": "Missing text"}), 400
-
-            result = self.anonymizer.anonymize(
-                text=data["text"],
-                analyzer_results=data.get("analyzer_results", []),
-                operators={"DEFAULT": {"operator_name": GenZOperator.NAME}},
-            )
-            return Response(result.to_json(), mimetype="application/json")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def create_app(): # noqa
     server = Server()
