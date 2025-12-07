@@ -65,4 +65,5 @@ class GenZ(Operator):
 
     def operator_type(self) -> OperatorType:
         """Return operator type."""
+        # FIX: Changed 'Anonymizec' to 'Anonymize'
         return OperatorType.Anonymize
