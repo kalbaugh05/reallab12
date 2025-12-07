@@ -56,3 +56,5 @@ def genz(client, body):
         json=body,
         headers={"Content-Type": "application/json"}
     )
+def genz(text: str):
+    return f"GENZ: {text}"

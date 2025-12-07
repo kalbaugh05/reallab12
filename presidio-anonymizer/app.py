@@ -1,6 +1,4 @@
 """REST API server for anonymizer."""
-from presidio_anonymizer.operators.genz import GenZOperator
-
 import logging
 import os
 from logging.config import fileConfig
@@ -9,6 +7,7 @@ from pathlib import Path
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
 from presidio_anonymizer.entities import InvalidParamError
+from presidio_anonymizer.operators.genz import GenZOperator
 from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
 
@@ -112,7 +111,7 @@ class Server:
         def server_error(e):
             self.logger.error(f"A fatal error occurred during execution: {e}")
             return jsonify(error="Internal server error"), 500
-        
+
 
 
 
@@ -130,30 +129,19 @@ class Server:
 
 @app.route("/genz", methods=["POST"])
 def genz():
-    try:
-        data = request.get_json()
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "Missing text"}), 400
 
-        text = data.get("text", "")
-        analyzer_results = data.get("analyzer_results", [])
+    engine = AnonymizerEngine()
+    result = engine.anonymize(
+        text=data["text"],
+        analyzer_results=data.get("analyzer_results", []),
+        operators={"DEFAULT": {"operator_name": GenZOperator.NAME}}
+    )
 
-        genz_config = {
-            "DEFAULT": {"operator_name": GenZOperator.NAME}
-        }
+    return Response(result.to_json(), mimetype="application/json")
 
-        anonymizer_result = self.anonymizer_engine.anonymize(
-            text=text,
-            analyzer_results=analyzer_results,
-            operators=genz_config
-        )
-
-        return Response(
-            anonymizer_result.to_json(),
-            mimetype="application/json"
-        )
-
-    except Exception as e:
-        self.logger.error(f"Error in /genz endpoint: {e}")
-        return jsonify(error="Invalid request"), 400
 
 
 
