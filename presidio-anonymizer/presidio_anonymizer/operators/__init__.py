@@ -7,7 +7,7 @@ from .deanonymize_keep import DeanonymizeKeep
 from .encrypt import Encrypt
 
 from .decrypt import Decrypt  # isort:skip
-from .genz import GenZ
+from .genz import GenZOperator
 from .hash import Hash
 from .keep import Keep
 from .mask import Mask
