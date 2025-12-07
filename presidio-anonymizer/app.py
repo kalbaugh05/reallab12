@@ -117,30 +117,33 @@ class Server:
 
 
 
-        @app.route("/genz-preview", methods=["GET"])
+        @self.app.route("/genz-preview", methods=["GET"])
         def genz_preview():
-          example_input = "Call Emily at 577-988-1234"
-          example_output = "Call GOAT at vibe check"
-          return jsonify({
-            "example": example_input,
-            "example output": example_output,
-           "description": "Example output of the genz anonymizer."
-         }), 200
+            """Return an example GenZ transformation."""
+            example_input = "Call Emily at 577-988-1234"
+            example_output = "Call GOAT at vibe check"
+            return jsonify(
+                {
+                    "example": example_input,
+                    "example_output": example_output,
+                    "description": "Example output of the GenZ anonymizer."
+                }
+            ), 200
 
-@app.route("/genz", methods=["POST"])
-def genz():
-    data = request.get_json()
-    if not data or "text" not in data:
-        return jsonify({"error": "Missing text"}), 400
+        @self.app.route("/genz", methods=["POST"])
+        def genz():
+            """Apply the GenZOperator anonymizer."""
+            data = request.get_json()
+            if not data or "text" not in data:
+                return jsonify({"error": "Missing text"}), 400
 
-    engine = AnonymizerEngine()
-    result = engine.anonymize(
-        text=data["text"],
-        analyzer_results=data.get("analyzer_results", []),
-        operators={"DEFAULT": {"operator_name": GenZOperator.NAME}}
-    )
+            result = self.anonymizer.anonymize(
+                text=data["text"],
+                analyzer_results=data.get("analyzer_results", []),
+                operators={"DEFAULT": {"operator_name": GenZOperator.NAME}},
+            )
+            return Response(result.to_json(), mimetype="application/json")
 
-    return Response(result.to_json(), mimetype="application/json")
 
 
 
