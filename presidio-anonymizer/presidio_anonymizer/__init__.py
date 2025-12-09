@@ -34,5 +34,4 @@ __all__ = [
     "RecognizerResult",
     "EngineResult",
     "DictRecognizerResult",
-    "GenZ",
 ]
