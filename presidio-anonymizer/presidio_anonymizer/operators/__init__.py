@@ -1,37 +1,44 @@
-"""Anonymizer root module."""
+"""Initializing all the existing anonymizers."""
 
-import logging
+from .operator import OperatorType, Operator 
+from .aes_cipher import AESCipher
+from .custom import Custom
+from .deanonymize_keep import DeanonymizeKeep
+from .encrypt import Encrypt
+from .decrypt import Decrypt
+from .genz import GenZ
+from .hash import Hash
+from .keep import Keep
+from .mask import Mask
+from .redact import Redact
+from .replace import Replace
 
-from .operators import GenZ # Corrected import path
-from .batch_anonymizer_engine import BatchAnonymizerEngine
-from .deanonymize_engine import DeanonymizeEngine
-from .entities import (
-    ConflictResolutionStrategy,
-    DictRecognizerResult,
-    EngineResult,
-    InvalidParamError,
-    OperatorConfig,
-    OperatorResult,
-    PIIEntity,
-    RecognizerResult,
-)
+try:
+    from .ahds_surrogate import AHDSSurrogate
+    AHDS_AVAILABLE = True
+except ImportError:
+    AHDSSurrogate = None
+    AHDS_AVAILABLE = False
 
-# Set up default logging (with NullHandler)
-
-
-logging.getLogger("presidio-anonymizer").addHandler(logging.NullHandler())
+from .operators_factory import OperatorsFactory
 
 __all__ = [
-    "AnonymizerEngine",
-    "DeanonymizeEngine",
-    "BatchAnonymizerEngine",
-    "InvalidParamError",
-    "ConflictResolutionStrategy",
-    "PIIEntity",
-    "OperatorConfig",
-    "OperatorResult",
-    "RecognizerResult",
-    "EngineResult",
-    "DictRecognizerResult",
+    "OperatorType",
+    "Operator",
+    "Hash",
+    "Mask",
+    "Redact",
+    "Keep",
+    "DeanonymizeKeep",
+    "Replace",
     "GenZ",
+    "Custom",
+    "Encrypt",
+    "Decrypt",
+    "AESCipher",
+    "OperatorsFactory",
+    "AHDS_AVAILABLE",
 ]
+
+if AHDS_AVAILABLE:
+    __all__.append("AHDSSurrogate")
