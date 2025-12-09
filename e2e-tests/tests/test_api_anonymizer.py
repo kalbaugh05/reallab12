@@ -432,7 +432,7 @@ def test_given_anonymize_called_with_genz_then_expected_valid_response_returned(
 
     @pytest.mark.api
     def test_given_anonymize_called_with_genz_then_expected_valid_response_returned():
-        payload = {
+        request_body = {
           "text": "Please contact Emily Carter at 734-555-9284 if you have questions about the workshop registration.",
           "analyzer_results": [
             {
@@ -450,6 +450,6 @@ def test_given_anonymize_called_with_genz_then_expected_valid_response_returned(
         ]
     }
 
-    status, _ = genz(payload)
+    status, _ = genz(request_body)
 
     assert status == 200
