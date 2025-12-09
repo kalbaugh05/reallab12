@@ -1,7 +1,7 @@
 import json
 
 import pytest
-
+from common.methods import genz
 from common.assertions import equal_json_strings
 from common.methods import anonymize, anonymizers, deanonymize
 
