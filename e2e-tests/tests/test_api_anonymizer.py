@@ -405,6 +405,9 @@ def test_overlapping_keep_both():
 
 @pytest.mark.api
 def test_given_anonymize_called_with_genz_then_expected_valid_response_returned():
+
+    from e2e_tests.common.methods import genz
+
     payload = {
         "text": "Please contact Emily Carter at 734-555-9284 if you have questions about the workshop registration.",
         "analyzer_results": [
