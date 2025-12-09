@@ -91,6 +91,43 @@ class Server:
             """Return a list of supported anonymizers."""
             return jsonify(self.anonymizer.get_anonymizers())
 
+        @self.app.route("/genz-preview", methods=["GET"])
+        def genz_preview():
+            return jsonify({
+                "example": "Call Emily at 577-988-1234",
+                "example output": "Call GOAT at vibe check",
+                "description": "Example output of the genz anonymizer."
+            })
+
+        @self.app.route("/genz", methods=["POST"])
+        def genz():
+            content = request.get_json()
+            if not content:
+                raise BadRequest("Invalid request json")
+
+            text = content.get("text", "")
+            analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
+                content.get("analyzer_results")
+            )
+
+            genz_config_raw = {
+                result.entity_type: {"type": "genz"}
+                for result in analyzer_results
+            }
+
+            anonymizers_config = AppEntitiesConvertor.operators_config_from_json(
+                genz_config_raw
+            )
+
+            result = self.anonymizer.anonymize(
+                text=text,
+                analyzer_results=analyzer_results,
+                operators=anonymizers_config
+            )
+
+            return Response(result.to_json(), mimetype="application/json")
+
+
         @self.app.route("/deanonymizers", methods=["GET"])
         def deanonymizers():
             """Return a list of supported deanonymizers."""
@@ -112,7 +149,7 @@ class Server:
             self.logger.error(f"A fatal error occurred during execution: {e}")
             return jsonify(error="Internal server error"), 500
 
-def create_app(): # noqa
+def create_app():
     server = Server()
     return server.app
 
