@@ -49,7 +49,7 @@ def __get_multipart_form_data(file):
         }
     return multipart_form_data
 
-def genz(payload):
+def genz(data):
     if isinstance(data, str):
         payload = json.loads(data)
     else:
