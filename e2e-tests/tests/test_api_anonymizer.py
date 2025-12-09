@@ -406,8 +406,7 @@ def test_overlapping_keep_both():
 @pytest.mark.api
 def test_given_anonymize_called_with_genz_then_expected_valid_response_returned():
 
-    from e2e_tests.common.methods import genz
-
+    
     payload = {
         "text": "Please contact Emily Carter at 734-555-9284 if you have questions about the workshop registration.",
         "analyzer_results": [
@@ -429,4 +428,28 @@ def test_given_anonymize_called_with_genz_then_expected_valid_response_returned(
     status, _ = genz(payload)
 
     # Only checking status code because GenZ operator output is random
+    assert status == 200
+
+    @pytest.mark.api
+    def test_given_anonymize_called_with_genz_then_expected_valid_response_returned():
+        payload = {
+          "text": "Please contact Emily Carter at 734-555-9284 if you have questions about the workshop registration.",
+          "analyzer_results": [
+            {
+                "start": 15,
+                "end": 27,
+                "score": 0.3,
+                "entity_type": "PERSON"
+            },
+            {
+                "start": 31,
+                "end": 43,
+                "score": 0.95,
+                "entity_type": "PHONE_NUMBER"
+            }
+        ]
+    }
+
+    status, _ = genz(payload)
+
     assert status == 200
